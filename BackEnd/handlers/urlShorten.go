@@ -1,7 +1,10 @@
 package handlers
 
 import (
+	"net/http"
 	"time"
+
+	"github.com/labstack/echo/v4"
 )
 
 type urlShorten struct {
@@ -10,4 +13,9 @@ type urlShorten struct {
 	shortUrl    string    `json:"short_url" bson:"short_url"`
 	createdAt   time.Time `json:"created_at" bson:"created_at"`
 	updatedAt   time.Time `json:"updated_at" bson:"updated_at"`
+}
+
+func createUrlShorten(c echo.Context) error {
+
+	return c.JSON(http.StatusCreated, "create complete")
 }
