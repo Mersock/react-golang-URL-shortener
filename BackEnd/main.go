@@ -6,6 +6,7 @@ import (
 	"log"
 
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
+	"github.com/Mersock/react-golang-URL-shortener/BackEnd/handlers"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -34,7 +35,7 @@ func init() {
 
 func main() {
 	e := echo.New()
-	e.POST("/api/item", handlers)
+	e.POST("/api/item", handlers.CreateUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)))
 }
