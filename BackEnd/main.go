@@ -29,7 +29,7 @@ func init() {
 	fmt.Println("dbinit", connectURI)
 	c, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectURI))
 	if err != nil {
-		log.Fatalf("Unable to connect mongo $v", err)
+		log.Fatalf("Unable to connect mongo %v", err)
 	}
 	db = c.Database(cfg.DBName)
 	col = db.Collection(cfg.DBColUrl)
