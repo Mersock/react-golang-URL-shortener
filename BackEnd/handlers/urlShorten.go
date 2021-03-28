@@ -16,22 +16,24 @@ var (
 	v = validator.New()
 )
 
-type URL struct {
-	ID          primitive.ObjectID `json:"_id" bson:"_id"`
-	OriginalUrl string             `json:"original_url" bson:"original_url" validate:"required,url"`
-	UrlCode     string             `json:"url_code" bson:"url_code"`
-	ShortUrl    string             `json:"short_url" bson:"short_url"`
-	CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
-	UpdatedAt   time.Time          `json:"updated_at" bson:"updated_at"`
-}
+type (
+	URL struct {
+		ID          primitive.ObjectID `json:"_id" bson:"_id"`
+		OriginalUrl string             `json:"original_url" bson:"original_url" validate:"required,url"`
+		UrlCode     string             `json:"url_code" bson:"url_code"`
+		ShortUrl    string             `json:"short_url" bson:"short_url"`
+		CreatedAt   time.Time          `json:"created_at" bson:"created_at"`
+		UpdatedAt   time.Time          `json:"updated_at" bson:"updated_at"`
+	}
 
-type UrlHandler struct {
-	Col dbiface.CollectionAPI
-}
+	UrlHandler struct {
+		Col dbiface.CollectionAPI
+	}
 
-type UrlShortenValidator struct {
-	validator *validator.Validate
-}
+	UrlShortenValidator struct {
+		validator *validator.Validate
+	}
+)
 
 func (v *UrlShortenValidator) Validate(i interface{}) error {
 	if err := v.validator.Struct(i); err != nil {
