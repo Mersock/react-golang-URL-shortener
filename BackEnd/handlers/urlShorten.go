@@ -34,7 +34,10 @@ type UrlShortenValidator struct {
 }
 
 func (v *UrlShortenValidator) Validate(i interface{}) error {
-	return v.validator.Struct(i)
+	if err := v.validator.Struct(i); err != nil {
+		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
+	}
+	return nil
 }
 
 func insertUrlShortens(ctx context.Context, urlShortens []URL, collection dbiface.CollectionAPI) ([]interface{}, error) {
