@@ -2,23 +2,30 @@ package handlers
 
 import (
 	"context"
+	"fmt"
 	"log"
 	"net/http"
+	"time"
 
+	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/dbiface"
+	"github.com/Mersock/react-golang-URL-shortener/BackEnd/helper"
 	"github.com/go-playground/validator/v10"
+	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
 )
 
 var (
-	v = validator.New()
+	v   = validator.New()
+	cfg config.Properties
 )
 
 type (
 	URL struct {
-		OriginalUrl string `json:"OriginalUrl" bson:"OriginalUrl" validate:"required,url"`
-		UrlCode     string `json:"UrlCode" bson:"UrlCode"`
-		ShortUrl    string `json:"ShortUrl" bson:"ShortUrl"`
+		OriginalUrl string    `json:"OriginalUrl" bson:"OriginalUrl" validate:"required,url"`
+		UrlCode     string    `json:"UrlCode" bson:"UrlCode"`
+		ShortUrl    string    `json:"ShortUrl" bson:"ShortUrl"`
+		Expires     time.Time `json:"expires"`
 	}
 
 	UrlHandler struct {
@@ -30,6 +37,12 @@ type (
 	}
 )
 
+func init() {
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
+		log.Fatalf("Configuration env cannot read %v", err)
+	}
+}
+
 func (v *UrlShortenValidator) Validate(i interface{}) error {
 	if err := v.validator.Struct(i); err != nil {
 		return echo.NewHTTPError(http.StatusBadRequest, err.Error())
@@ -38,12 +51,21 @@ func (v *UrlShortenValidator) Validate(i interface{}) error {
 }
 
 func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.CollectionAPI) (interface{}, error) {
-	res, err := collection.InsertOne(context.Background(), urlShortens)
+	t := time.Now()
+	expires := t.Add(time.Hour)
+	urlShortens.Expires = expires
+
+	strCode := helper.RandURLCode(8, 1, 1)
+	urlShortens.UrlCode = strCode
+	dd := fmt.Sprintf("%s://%s/%s", cfg.URLSchema, cfg.URLPrefix, strCode)
+	urlShortens.ShortUrl = dd
+	_, err := collection.InsertOne(context.Background(), urlShortens)
 	if err != nil {
 		log.Printf("Unable to insert :%v", err)
 		return nil, err
 	}
-	return res, nil
+
+	return urlShortens, nil
 }
 
 func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
@@ -59,9 +81,9 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 		return err
 	}
 
-	_, err := insertUrlShortens(context.Background(), urlShortens, h.Col)
+	res, err := insertUrlShortens(context.Background(), urlShortens, h.Col)
 	if err != nil {
 		return err
 	}
-	return c.JSON(http.StatusCreated, urlShortens)
+	return c.JSON(http.StatusCreated, res)
 }
