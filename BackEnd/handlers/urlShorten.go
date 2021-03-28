@@ -22,10 +22,11 @@ var (
 
 type (
 	URL struct {
-		OriginalUrl string    `json:"OriginalUrl" bson:"OriginalUrl" validate:"required,url"`
-		UrlCode     string    `json:"UrlCode" bson:"UrlCode"`
-		ShortUrl    string    `json:"ShortUrl" bson:"ShortUrl"`
-		Expires     time.Time `json:"expires"`
+		OriginalUrl string    `json:"originalUrl" bson:"OriginalUrl" validate:"required,url"`
+		UrlCode     string    `json:"urlCode" bson:"UrlCode"`
+		ShortUrl    string    `json:"shortUrl" bson:"ShortUrl"`
+		Expires     time.Time `json:"expires" bson:"expires"`
+		Counter     int       `json:"counter" bson:"counter"`
 	}
 
 	UrlHandler struct {
@@ -57,8 +58,12 @@ func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.
 
 	strCode := helper.RandURLCode(8, 1, 1)
 	urlShortens.UrlCode = strCode
-	dd := fmt.Sprintf("%s://%s/%s", cfg.URLSchema, cfg.URLPrefix, strCode)
-	urlShortens.ShortUrl = dd
+
+	shortUrl := fmt.Sprintf("%s://%s/%s", cfg.URLSchema, cfg.URLPrefix, strCode)
+	urlShortens.ShortUrl = shortUrl
+
+	urlShortens.Counter = 0
+
 	_, err := collection.InsertOne(context.Background(), urlShortens)
 	if err != nil {
 		log.Printf("Unable to insert :%v", err)
