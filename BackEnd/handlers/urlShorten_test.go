@@ -8,7 +8,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/assert"
@@ -17,10 +16,8 @@ import (
 )
 
 var (
-	c   *mongo.Client
 	db  *mongo.Database
 	col *mongo.Collection
-	cfg config.Properties
 	h   UrlHandler
 )
 
