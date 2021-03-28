@@ -35,7 +35,8 @@ func init() {
 
 func main() {
 	e := echo.New()
-	e.POST("/api/item", handlers.CreateUrlShorten)
+	h := handlers.UrlHandler{Col: col}
+	e.POST("/api/item", h.CreateUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)))
 }
