@@ -9,6 +9,7 @@ import (
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/handlers"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4/middleware"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 )
@@ -36,6 +37,7 @@ func init() {
 
 func main() {
 	e := echo.New()
+	e.Pre(middleware.RemoveTrailingSlash())
 	h := handlers.UrlHandler{Col: col}
 	e.POST("/api/item", h.CreateUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
