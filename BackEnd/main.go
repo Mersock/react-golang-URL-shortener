@@ -38,7 +38,7 @@ func main() {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
 	h := handlers.UrlHandler{Col: col}
-	e.POST("/api/item", h.CreateUrlShorten)
+	e.POST("/api/urlShorten", h.CreateUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }
