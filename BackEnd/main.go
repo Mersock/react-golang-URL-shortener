@@ -26,7 +26,6 @@ func init() {
 		log.Fatalf("Configuration env cannot read %v", err)
 	}
 	connectURI := fmt.Sprintf("mongodb://%s:%s@%s:%s/?authSource=admin", cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBPort)
-	fmt.Println("dbinit", connectURI)
 	c, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectURI))
 	if err != nil {
 		log.Fatalf("Unable to connect mongo %v", err)
