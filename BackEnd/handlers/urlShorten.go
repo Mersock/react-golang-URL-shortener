@@ -13,6 +13,7 @@ import (
 	"github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
 	"github.com/labstack/echo/v4"
+	"go.mongodb.org/mongo-driver/bson"
 )
 
 var (
@@ -22,8 +23,8 @@ var (
 
 type (
 	URL struct {
-		OriginalUrl string    `json:"originalUrl" bson:"OriginalUrl" validate:"required,url"`
-		UrlCode     string    `json:"urlCode" bson:"UrlCode"`
+		OriginalUrl string    `json:"originalUrl" bson:"originalUrl" validate:"required,url"`
+		UrlCode     string    `json:"urlCode" bson:"urlCode"`
 		ShortUrl    string    `json:"shortUrl" bson:"ShortUrl"`
 		Expires     time.Time `json:"expires" bson:"expires"`
 		Counter     int       `json:"counter" bson:"counter"`
@@ -73,6 +74,15 @@ func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.
 	return urlShortens, nil
 }
 
+func findOriginal(ctx context.Context, collection dbiface.CollectionAPI, filter interface{}) string {
+	var shortener URL
+	err := collection.FindOne(ctx, filter).Decode(&shortener)
+	if err != nil {
+		log.Printf("Unable to bind :%v", err)
+	}
+	return shortener.OriginalUrl
+}
+
 func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 	var urlShortens URL
 	c.Echo().Validator = &UrlShortenValidator{validator: v}
@@ -91,4 +101,10 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 		return err
 	}
 	return c.JSON(http.StatusCreated, res)
+}
+
+func (h *UrlHandler) RedirectShorten(c echo.Context) error {
+	urlCode := c.Param("urlCode")
+	originalUrl := findOriginal(context.Background(), h.Col, bson.M{"urlCode": urlCode})
+	return c.Redirect(http.StatusMovedPermanently, originalUrl)
 }
