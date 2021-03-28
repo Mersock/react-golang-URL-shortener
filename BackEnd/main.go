@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	c   *mongo.Client
 	db  *mongo.Database
 	col *mongo.Collection
 	cfg config.Properties
