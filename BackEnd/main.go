@@ -25,6 +25,7 @@ func init() {
 		log.Fatalf("Configuration env cannot read %v", err)
 	}
 	connectURI := fmt.Sprintf("mongodb://%s:%s@%s:%s/?authSource=admin", cfg.DBUser, cfg.DBPass, cfg.DBHost, cfg.DBPort)
+	fmt.Println("dbinit", connectURI)
 	c, err := mongo.Connect(context.Background(), options.Client().ApplyURI(connectURI))
 	if err != nil {
 		log.Fatalf("Unable to connect mongo $v", err)
@@ -38,5 +39,5 @@ func main() {
 	h := handlers.UrlHandler{Col: col}
 	e.POST("/api/item", h.CreateUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
-	e.Logger.Fatal(e.Start(fmt.Sprintf("%s:%s", cfg.Host, cfg.Port)))
+	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }
