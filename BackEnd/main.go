@@ -36,6 +36,9 @@ func init() {
 func main() {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
 	h := handlers.UrlHandler{Col: col}
 	e.POST("/api/urlShorten", h.CreateUrlShorten)
 	e.GET("/:urlCode", h.RedirectShorten)
