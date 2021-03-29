@@ -1,10 +1,14 @@
 import React from 'react'
+import { Col, Row } from 'reactstrap'
+import Table from './table'
 
-const index = () => {
+const index = (props) => {
     return (
-        <div>
-            admin
-        </div>
+        <Row>
+            <Col>
+                <Table />
+            </Col>
+        </Row>
     )
 }
 
