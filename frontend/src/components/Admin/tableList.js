@@ -1,7 +1,7 @@
 import React from 'react'
 import { Table } from 'reactstrap'
 
-const table = (props) => {
+const TableList = (props) => {
     return (
         <div>
             <Table hover striped bordered borderless>
@@ -38,4 +38,4 @@ const table = (props) => {
     )
 }
 
-export default table
+export default TableList
