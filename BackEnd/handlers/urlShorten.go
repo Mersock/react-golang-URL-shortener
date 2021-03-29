@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/dbiface"
@@ -114,6 +115,13 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 	if err := c.Validate(urlShortens); err != nil {
 		log.Printf("Unable to validate the urlShorten %+v %v", urlShortens, err)
 		return err
+	}
+
+	validURL := regexp.MustCompile(`^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$`)
+	if !validURL.MatchString(urlShortens.OriginalUrl) {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "OriginalUrl is invalid",
+		})
 	}
 
 	res, err := insertUrlShortens(context.Background(), urlShortens, h.Col)
