@@ -1,7 +1,15 @@
-import React from 'react'
+import React, { useState, useEffect } from 'react'
 import { Form, FormGroup, Input, Table } from 'reactstrap'
+import { useDispatch } from 'react-redux'
+import { GET_URL } from '../../actions/types'
+import urlShortens from '../../apis/urlShortens'
+import { getUrl } from '../../actions'
+
 
 const TableList = ({ tableList }) => {
+    const dispatch = useDispatch()
+    const [term, setTerm] = useState('')
+    const [debouncedTerm, setDebouncedTerm] = useState(term)
 
     const handleTbody = () => {
         const list = tableList.map((list, index) => {
@@ -20,11 +28,40 @@ const TableList = ({ tableList }) => {
         return list
     }
 
+    useEffect(() => {
+        const timeoutId = setTimeout(() => {
+            setDebouncedTerm(term)
+        }, 1000);
+
+        return () => {
+            clearTimeout(timeoutId)
+        }
+
+    }, [term])
+
+    useEffect(() => {
+        const fetchSearch = async () => {
+            try {
+                const res = await urlShortens.get('/api/urlShorten', { params: { urlCode: debouncedTerm } })
+                dispatch({ type: GET_URL, payload: res.data });
+            } catch (error) {
+                console.error("getUrl", error);
+            }
+        }
+
+        if (debouncedTerm) {
+            fetchSearch()
+        } else {
+            dispatch(getUrl())
+        }
+
+    }, [debouncedTerm, dispatch])
+
     return (
-        <div>
+        <div style={{ marginTop: '20px' }}>
             <Form>
                 <FormGroup>
-                    <Input type="text" name="urlCode" id="urlCode" placeholder="Url Code" />
+                    <Input type="text" name="urlCode" id="urlCode" placeholder="Url Code" onChange={(e) => setTerm(e.target.value)} />
                 </FormGroup>
             </Form>
             <Table hover striped bordered borderless>
