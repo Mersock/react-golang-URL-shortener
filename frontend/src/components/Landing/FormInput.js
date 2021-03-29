@@ -8,12 +8,12 @@ const FormInput = (props) => {
     const dispatch = useDispatch()
     const [inputInValid, setinputInValid] = useState(false)
     const [urlInput, seturlInput] = useState('')
-    const [shortUrl, setshortUrl] = useState('')
-    const urlShorten = useSelector(state => state.urlShortens)
+    const [shortens, setShortens] = useState('')
+    const urlShorten = useSelector(state => state.urlShortens.createUrl)
 
     const handleSubmit = (e) => {
         e.preventDefault()
-        const url = isUrl(urlInput)
+        const url = isUrl(_.trim(urlInput))
         if (!url) {
             setinputInValid(true)
         } else {
@@ -35,9 +35,15 @@ const FormInput = (props) => {
     }
 
     useEffect(() => {
-        const { shortUrl } = urlShorten
-        if (!_.isUndefined(shortUrl)) {
-            setshortUrl(shortUrl)
+        if (!_.isEmpty(urlShorten)) {
+            const { shortUrl, status } = urlShorten
+            if (!_.isUndefined(shortUrl)) {
+                setShortens(shortUrl)
+            }
+            if (!_.isNull(status) && status === 400) {
+                setinputInValid(true)
+                setShortens('')
+            }
         }
     }, [urlShorten])
 
@@ -56,11 +62,11 @@ const FormInput = (props) => {
                 </FormGroup>
                 <FormGroup>
                     {
-                        shortUrl !== '' ? (
+                        shortens !== '' ? (
                             <div>
                                 <Label for="exampleShortURL"><h2>Short Url</h2></Label>
                                 <Alert color="success">
-                                    <a href={shortUrl} target="_blank" without rel="noreferrer" > {shortUrl}</a>
+                                    <a href={shortens} target="_blank" rel="noreferrer" > {shortens}</a>
                                 </Alert>
                             </div>
                         ) : null

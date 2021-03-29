@@ -2,7 +2,9 @@ import { CREATE_URL } from "../actions/types"
 
 
 const initialState = {
-    createUrl: {}
+    createUrl: {
+        status: null
+    }
 }
 
 const urlShortens = (state = initialState, { type, payload }) => {
