@@ -39,6 +39,7 @@ func main() {
 	h := handlers.UrlHandler{Col: col}
 	e.POST("/api/urlShorten", h.CreateUrlShorten)
 	e.GET("/:urlCode", h.RedirectShorten)
+	e.GET("/api/urlShorten", h.GetUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }
