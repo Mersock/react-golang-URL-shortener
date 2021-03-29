@@ -1,6 +1,6 @@
 import React from 'react'
-import Header from './Header'
-import FormInput from './FormInput'
+import Header from './header'
+import FormInput from './formInput'
 
 const index = (props) => {
     return (
