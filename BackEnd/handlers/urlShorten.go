@@ -92,9 +92,9 @@ func findOriginalUrl(ctx context.Context, collection dbiface.CollectionAPI, filt
 	return shortener.OriginalUrl
 }
 
-func listUrlShortens(ctx context.Context, collection dbiface.CollectionAPI) ([]URL, error) {
+func listUrlShortens(ctx context.Context, collection dbiface.CollectionAPI, filter interface{}) ([]URL, error) {
 	var urlShortens []URL
-	cursor, err := collection.Find(ctx, bson.M{})
+	cursor, err := collection.Find(ctx, filter)
 	if err != nil {
 		log.Printf("Unable to find listUrlShortens :%v", err)
 		return nil, err
@@ -125,26 +125,42 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 		log.Printf("Unable to insert urlShorten %v", err)
 		return err
 	}
+
 	return c.JSON(http.StatusCreated, res)
 }
 
 func (h *UrlHandler) RedirectShorten(c echo.Context) error {
-
 	urlCode := c.Param("urlCode")
 	originalUrl := findOriginalUrl(context.Background(), h.Col, bson.M{"urlCode": urlCode})
+
 	if originalUrl == "" {
 		return c.JSON(http.StatusNotFound, map[string]string{
 			"message": "Not Found",
 		})
 	}
+
 	return c.Redirect(http.StatusMovedPermanently, originalUrl)
 }
 
 func (h *UrlHandler) GetUrlShorten(c echo.Context) error {
-	urlShorten, err := listUrlShortens(context.Background(), h.Col)
+	urlCode := c.QueryParam("urlCode")
+	var filter bson.M
+
+	if urlCode != "" {
+		filter = bson.M{"urlCode": urlCode}
+	} else {
+		filter = bson.M{}
+	}
+
+	urlShorten, err := listUrlShortens(context.Background(), h.Col, filter)
 	if err != nil {
 		log.Printf("Unable to get list urlShorten %v", err)
 		return err
 	}
+
+	if urlShorten == nil {
+		return c.JSON(http.StatusOK, make([]string, 0))
+	}
+
 	return c.JSON(http.StatusOK, urlShorten)
 }
