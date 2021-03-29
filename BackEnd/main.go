@@ -15,7 +15,6 @@ import (
 )
 
 var (
-	c   *mongo.Client
 	db  *mongo.Database
 	col *mongo.Collection
 	cfg config.Properties
@@ -37,8 +36,13 @@ func init() {
 func main() {
 	e := echo.New()
 	e.Pre(middleware.RemoveTrailingSlash())
+	e.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: "method=${method}, uri=${uri}, status=${status}\n",
+	}))
 	h := handlers.UrlHandler{Col: col}
-	e.POST("/api/item", h.CreateUrlShorten)
+	e.POST("/api/urlShorten", h.CreateUrlShorten)
+	e.GET("/:urlCode", h.RedirectShorten)
+	e.GET("/api/urlShorten", h.GetUrlShorten)
 	e.Logger.Infof("Listen on $s:%s", cfg.DBHost, cfg.Port)
 	e.Logger.Fatal(e.Start(fmt.Sprintf(":%s", cfg.Port)))
 }
