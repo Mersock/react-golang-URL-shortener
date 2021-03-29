@@ -57,7 +57,7 @@ const FormInput = (props) => {
                             <span>Ex: <a href="https://www.youtube.com">https://www.youtube.com</a></span>
                         </div>
                     </Label>
-                    <Input onChange={(e) => seturlInput(e.target.value)} invalid={inputInValid} type="text" name="originalURL" id="originalURL" placeholder="originalURL" />
+                    <Input onChange={(e) => seturlInput(e.target.value)} invalid={inputInValid} type="text" name="originalURL" id="originalURL" placeholder="Original URL" />
                     <FormFeedback>Oh noes! that Url is invalid</FormFeedback>
                 </FormGroup>
                 <FormGroup>

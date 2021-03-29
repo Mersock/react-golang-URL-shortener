@@ -1,5 +1,5 @@
 import urlShortens from '../apis/urlShortens'
-import { CREATE_URL } from "./types";
+import { CREATE_URL, GET_URL } from "./types";
 
 export const createUrl = formValue => async dispatch => {
     try {
@@ -7,7 +7,6 @@ export const createUrl = formValue => async dispatch => {
         const createUrl = {
             ...res.data, status: res.status
         }
-        console.log(res);
         dispatch({ type: CREATE_URL, payload: createUrl });
     } catch (error) {
         const createUrl = {
@@ -15,5 +14,14 @@ export const createUrl = formValue => async dispatch => {
         }
         dispatch({ type: CREATE_URL, payload: createUrl });
         console.error("createUrl", error);
+    }
+}
+
+export const getUrl = () => async dispatch => {
+    try {
+        const res = await urlShortens.get('/api/urlShorten')
+        dispatch({ type: GET_URL, payload: res.data });
+    } catch (error) {
+        console.error("getUrl", error);
     }
 }
