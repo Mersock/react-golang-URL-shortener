@@ -1,17 +1,23 @@
 import React, { useState } from 'react'
+import { useDispatch } from 'react-redux'
 import { Button, Form, FormGroup, Label, Input, Alert, FormFeedback } from 'reactstrap';
+import { createUrl } from '../../actions';
 
 const FormInput = (props) => {
-    const [inputValid, setinputValid] = useState(false)
+    const dispatch = useDispatch()
+    const [inputInValid, setinputInValid] = useState(false)
     const [urlInput, seturlInput] = useState('')
 
     const handleSubmit = (e) => {
         e.preventDefault()
         const url = isUrl(urlInput)
         if (!url) {
-            setinputValid(true)
+            setinputInValid(true)
         } else {
-            setinputValid(false)
+            dispatch(createUrl({
+                OriginalUrl: urlInput
+            }))
+            setinputInValid(false)
         }
 
     }
@@ -35,7 +41,7 @@ const FormInput = (props) => {
                             <span>Ex: <a href="https://www.youtube.com">https://www.youtube.com</a></span>
                         </div>
                     </Label>
-                    <Input onChange={(e) => seturlInput(e.target.value)} invalid={inputValid} type="text" name="originalURL" id="originalURL" placeholder="originalURL" />
+                    <Input onChange={(e) => seturlInput(e.target.value)} invalid={inputInValid} type="text" name="originalURL" id="originalURL" placeholder="originalURL" />
                     <FormFeedback>Oh noes! that Url is invalid</FormFeedback>
                 </FormGroup>
                 <FormGroup>
