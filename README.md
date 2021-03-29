@@ -27,7 +27,7 @@ cd react-golang-URL-shortener
 
 #### Run back end && front end
 
-#### Make sure your machine has install Docker [Docker](https://www.docker.com/)
+#### Make sure your machine has install [Docker](https://www.docker.com/)
 
 ```sh
 # start
