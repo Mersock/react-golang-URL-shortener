@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/dbiface"
@@ -23,11 +22,10 @@ var (
 
 type (
 	URL struct {
-		OriginalUrl string    `json:"originalUrl" bson:"originalUrl" validate:"required,url"`
-		UrlCode     string    `json:"urlCode" bson:"urlCode"`
-		ShortUrl    string    `json:"shortUrl" bson:"ShortUrl"`
-		Expires     time.Time `json:"expires" bson:"expires"`
-		Counter     int       `json:"counter" bson:"counter"`
+		OriginalUrl string `json:"originalUrl" bson:"originalUrl" validate:"required,url"`
+		UrlCode     string `json:"urlCode" bson:"urlCode"`
+		ShortUrl    string `json:"shortUrl" bson:"ShortUrl"`
+		Counter     int    `json:"counter" bson:"counter"`
 	}
 
 	UrlHandler struct {
@@ -53,9 +51,6 @@ func (v *UrlShortenValidator) Validate(i interface{}) error {
 }
 
 func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.CollectionAPI) (interface{}, error) {
-	t := time.Now()
-	expires := t.Add(time.Hour)
-	urlShortens.Expires = expires
 
 	strCode := helper.RandURLCode(8, 1, 1)
 	urlShortens.UrlCode = strCode
