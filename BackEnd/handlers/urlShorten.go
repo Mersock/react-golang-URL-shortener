@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
-	"time"
+	"regexp"
 
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/config"
 	"github.com/Mersock/react-golang-URL-shortener/BackEnd/dbiface"
@@ -23,11 +23,10 @@ var (
 
 type (
 	URL struct {
-		OriginalUrl string    `json:"originalUrl" bson:"originalUrl" validate:"required,url"`
-		UrlCode     string    `json:"urlCode" bson:"urlCode"`
-		ShortUrl    string    `json:"shortUrl" bson:"ShortUrl"`
-		Expires     time.Time `json:"expires" bson:"expires"`
-		Counter     int       `json:"counter" bson:"counter"`
+		OriginalUrl string `json:"originalUrl" bson:"originalUrl" validate:"required,url"`
+		UrlCode     string `json:"urlCode" bson:"urlCode"`
+		ShortUrl    string `json:"shortUrl" bson:"ShortUrl"`
+		Counter     int    `json:"counter" bson:"counter"`
 	}
 
 	UrlHandler struct {
@@ -53,9 +52,6 @@ func (v *UrlShortenValidator) Validate(i interface{}) error {
 }
 
 func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.CollectionAPI) (interface{}, error) {
-	t := time.Now()
-	expires := t.Add(time.Hour)
-	urlShortens.Expires = expires
 
 	strCode := helper.RandURLCode(8, 1, 1)
 	urlShortens.UrlCode = strCode
@@ -80,6 +76,7 @@ func findOriginalUrl(ctx context.Context, collection dbiface.CollectionAPI, filt
 	if err != nil {
 		log.Printf("Unable to find OriginalUrl :%v", err)
 	}
+
 	updateCounter := bson.M{
 		"$set": bson.M{"counter": shortener.Counter + 1},
 	}
@@ -120,6 +117,13 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 		return err
 	}
 
+	validURL := regexp.MustCompile(`^(http:\/\/www\.|https:\/\/www\.|http:\/\/|https:\/\/)?[a-z0-9]+([\-\.]{1}[a-z0-9]+)*\.[a-z]{2,5}(:[0-9]{1,5})?(\/.*)?$`)
+	if !validURL.MatchString(urlShortens.OriginalUrl) {
+		return c.JSON(http.StatusBadRequest, map[string]string{
+			"message": "OriginalUrl is invalid",
+		})
+	}
+
 	res, err := insertUrlShortens(context.Background(), urlShortens, h.Col)
 	if err != nil {
 		log.Printf("Unable to insert urlShorten %v", err)
@@ -139,7 +143,7 @@ func (h *UrlHandler) RedirectShorten(c echo.Context) error {
 		})
 	}
 
-	return c.Redirect(http.StatusMovedPermanently, originalUrl)
+	return c.Redirect(http.StatusFound, originalUrl)
 }
 
 func (h *UrlHandler) GetUrlShorten(c echo.Context) error {
