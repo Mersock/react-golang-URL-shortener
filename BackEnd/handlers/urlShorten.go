@@ -122,6 +122,11 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 func (h *UrlHandler) RedirectShorten(c echo.Context) error {
 	urlCode := c.Param("urlCode")
 	originalUrl := findOriginalUrl(context.Background(), h.Col, bson.M{"urlCode": urlCode})
+	if originalUrl == "" {
+		return c.JSON(http.StatusNotFound, map[string]string{
+			"message": "Not Found",
+		})
+	}
 	return c.Redirect(http.StatusMovedPermanently, originalUrl)
 }
 
