@@ -1,5 +1,5 @@
 import React from 'react'
-import { Table } from 'reactstrap'
+import { Form, FormGroup, Input, Table } from 'reactstrap'
 
 const TableList = ({ tableList }) => {
 
@@ -22,6 +22,11 @@ const TableList = ({ tableList }) => {
 
     return (
         <div>
+            <Form>
+                <FormGroup>
+                    <Input type="text" name="urlCode" id="urlCode" placeholder="Url Code" />
+                </FormGroup>
+            </Form>
             <Table hover striped bordered borderless>
                 <thead>
                     <tr>
