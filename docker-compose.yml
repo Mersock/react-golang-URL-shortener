@@ -3,16 +3,30 @@ services:
   app:
     container_name: react-golang-url-shortener-backend
     build: 
-      context: ./BackEnd
+      context: ./backend
       dockerfile: Dockerfile.dev
     ports:
       - "8080:8080"
     volumes:
-      - ./BackEnd/:/app
+      - ./backend/:/app
     depends_on: 
       - mongo  
     networks:   
       - react-golang-url-shortener
+
+  web:
+    container_name: react-golang-url-shortener-frontend
+    build: 
+      context: ./frontend
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    volumes:
+      - ./frontend/:/usr/app
+      - /usr/app/node_modules
+    networks:   
+      - react-golang-url-shortener      
+
   mongo:
     image: mongo:4.4.3
     container_name: react-golang-url-shortener-mongo
@@ -22,7 +36,8 @@ services:
     ports: 
       - "27017:27017"  
     networks:   
-      - react-golang-url-shortener        
+      - react-golang-url-shortener       
+
   mongo-express:
     image: mongo-express:0.54
     container_name: react-golang-url-shortener-mongo-express
@@ -34,7 +49,9 @@ services:
     depends_on: 
       - mongo  
     networks:   
-      - react-golang-url-shortener      
+      - react-golang-url-shortener    
+
+
 networks:
   react-golang-url-shortener:
     name: react-golang-url-shortener-network  
