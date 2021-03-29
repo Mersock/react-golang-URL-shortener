@@ -80,6 +80,15 @@ func findOriginalUrl(ctx context.Context, collection dbiface.CollectionAPI, filt
 	if err != nil {
 		log.Printf("Unable to find OriginalUrl :%v", err)
 	}
+	updateCounter := bson.M{
+		"$set": bson.M{"counter": shortener.Counter + 1},
+	}
+
+	err = collection.FindOneAndUpdate(ctx, filter, updateCounter).Decode(&shortener)
+	if err != nil {
+		log.Printf("Unable to FindOneAndUpdate counter :%v", err)
+	}
+
 	return shortener.OriginalUrl
 }
 
@@ -120,6 +129,7 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 }
 
 func (h *UrlHandler) RedirectShorten(c echo.Context) error {
+
 	urlCode := c.Param("urlCode")
 	originalUrl := findOriginalUrl(context.Background(), h.Col, bson.M{"urlCode": urlCode})
 	if originalUrl == "" {
@@ -136,6 +146,5 @@ func (h *UrlHandler) GetUrlShorten(c echo.Context) error {
 		log.Printf("Unable to get list urlShorten %v", err)
 		return err
 	}
-
 	return c.JSON(http.StatusOK, urlShorten)
 }
