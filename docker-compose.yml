@@ -22,7 +22,7 @@ services:
     ports:
       - "3000:3000"
     volumes:
-      - ./fronted/:/app
+      - ./frontend/:/usr/app
       - /usr/app/node_modules
     networks:   
       - react-golang-url-shortener      
