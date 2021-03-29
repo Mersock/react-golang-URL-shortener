@@ -1,37 +1,40 @@
 import React from 'react'
 import { Table } from 'reactstrap'
 
-const TableList = (props) => {
+const TableList = ({ tableList }) => {
+
+    const handleTbody = () => {
+        const list = tableList.map((list, index) => {
+            const { counter, expires, originalUrl, shortUrl, urlCode } = list
+            return (
+                <tr key={index}>
+                    <th scope="row">{index + 1}</th>
+                    <td>{urlCode}</td>
+                    <td><a href={shortUrl} target="_blank" rel="noreferrer" >{shortUrl} </a></td>
+                    <td><a href={originalUrl} target="_blank" rel="noreferrer" >{originalUrl}</a></td>
+                    <td>{expires}</td>
+                    <td>{counter}</td>
+                </tr>
+            )
+        })
+        return list
+    }
+
     return (
         <div>
             <Table hover striped bordered borderless>
                 <thead>
                     <tr>
                         <th>#</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Username</th>
+                        <th>Url Code</th>
+                        <th>Short Url</th>
+                        <th>Original Url</th>
+                        <th>expires</th>
+                        <th>Counter</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <th scope="row">1</th>
-                        <td>Mark</td>
-                        <td>Otto</td>
-                        <td>@mdo</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">2</th>
-                        <td>Jacob</td>
-                        <td>Thornton</td>
-                        <td>@fat</td>
-                    </tr>
-                    <tr>
-                        <th scope="row">3</th>
-                        <td>Larry</td>
-                        <td>the Bird</td>
-                        <td>@twitter</td>
-                    </tr>
+                    {handleTbody()}
                 </tbody>
             </Table>
         </div>
