@@ -80,6 +80,7 @@ func findOriginalUrl(ctx context.Context, collection dbiface.CollectionAPI, filt
 	if err != nil {
 		log.Printf("Unable to find OriginalUrl :%v", err)
 	}
+
 	updateCounter := bson.M{
 		"$set": bson.M{"counter": shortener.Counter + 1},
 	}
@@ -139,7 +140,7 @@ func (h *UrlHandler) RedirectShorten(c echo.Context) error {
 		})
 	}
 
-	return c.Redirect(http.StatusMovedPermanently, originalUrl)
+	return c.Redirect(http.StatusFound, originalUrl)
 }
 
 func (h *UrlHandler) GetUrlShorten(c echo.Context) error {
