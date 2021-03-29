@@ -47,10 +47,6 @@ Back End - http://localhost:8080
 
 Mongo Express - http://localhost:8081
 
-## Demo
-
-![NSGIF](https://j.gifs.com/1rnQV0.gif)
-
 ## ☑ TODO
 
 - [x] User page to input a url and return a shortened URL
