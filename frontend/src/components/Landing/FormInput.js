@@ -1,12 +1,15 @@
-import React, { useState } from 'react'
-import { useDispatch } from 'react-redux'
+import React, { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { Button, Form, FormGroup, Label, Input, Alert, FormFeedback } from 'reactstrap';
 import { createUrl } from '../../actions';
+import _ from 'lodash'
 
 const FormInput = (props) => {
     const dispatch = useDispatch()
     const [inputInValid, setinputInValid] = useState(false)
     const [urlInput, seturlInput] = useState('')
+    const [shortUrl, setshortUrl] = useState('')
+    const urlShorten = useSelector(state => state.urlShortens)
 
     const handleSubmit = (e) => {
         e.preventDefault()
@@ -15,7 +18,7 @@ const FormInput = (props) => {
             setinputInValid(true)
         } else {
             dispatch(createUrl({
-                OriginalUrl: urlInput
+                OriginalUrl: _.trim(urlInput)
             }))
             setinputInValid(false)
         }
@@ -31,6 +34,13 @@ const FormInput = (props) => {
         return false
     }
 
+    useEffect(() => {
+        const { shortUrl } = urlShorten
+        if (!_.isUndefined(shortUrl)) {
+            setshortUrl(shortUrl)
+        }
+    }, [urlShorten])
+
     return (
         <div>
             <Form onSubmit={handleSubmit}>
@@ -45,10 +55,17 @@ const FormInput = (props) => {
                     <FormFeedback>Oh noes! that Url is invalid</FormFeedback>
                 </FormGroup>
                 <FormGroup>
-                    <Label for="exampleShortURL"><h2>Short Url</h2></Label>
-                    <Alert color="success">
-                        <a href="https://www.youtube.com"> https://www.youtube.com</a>
-                    </Alert>
+                    {
+                        shortUrl !== '' ? (
+                            <div>
+                                <Label for="exampleShortURL"><h2>Short Url</h2></Label>
+                                <Alert color="success">
+                                    <a href={shortUrl} target="_blank" without rel="noreferrer" > {shortUrl}</a>
+                                </Alert>
+                            </div>
+                        ) : null
+                    }
+
                 </FormGroup>
                 <Button color="primary" size="lg" block>Submit</Button>
             </Form>
