@@ -74,13 +74,28 @@ func insertUrlShortens(ctx context.Context, urlShortens URL, collection dbiface.
 	return urlShortens, nil
 }
 
-func findOriginal(ctx context.Context, collection dbiface.CollectionAPI, filter interface{}) string {
+func findOriginalUrl(ctx context.Context, collection dbiface.CollectionAPI, filter interface{}) string {
 	var shortener URL
 	err := collection.FindOne(ctx, filter).Decode(&shortener)
 	if err != nil {
-		log.Printf("Unable to bind :%v", err)
+		log.Printf("Unable to find OriginalUrl :%v", err)
 	}
 	return shortener.OriginalUrl
+}
+
+func listUrlShortens(ctx context.Context, collection dbiface.CollectionAPI) ([]URL, error) {
+	var urlShortens []URL
+	cursor, err := collection.Find(ctx, bson.M{})
+	if err != nil {
+		log.Printf("Unable to find listUrlShortens :%v", err)
+		return nil, err
+	}
+	err = cursor.All(ctx, &urlShortens)
+	if err != nil {
+		log.Printf("Unable to read cursor listUrlShortens :%v", err)
+		return nil, err
+	}
+	return urlShortens, nil
 }
 
 func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
@@ -98,6 +113,7 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 
 	res, err := insertUrlShortens(context.Background(), urlShortens, h.Col)
 	if err != nil {
+		log.Printf("Unable to insert urlShorten %v", err)
 		return err
 	}
 	return c.JSON(http.StatusCreated, res)
@@ -105,6 +121,16 @@ func (h *UrlHandler) CreateUrlShorten(c echo.Context) error {
 
 func (h *UrlHandler) RedirectShorten(c echo.Context) error {
 	urlCode := c.Param("urlCode")
-	originalUrl := findOriginal(context.Background(), h.Col, bson.M{"urlCode": urlCode})
+	originalUrl := findOriginalUrl(context.Background(), h.Col, bson.M{"urlCode": urlCode})
 	return c.Redirect(http.StatusMovedPermanently, originalUrl)
+}
+
+func (h *UrlHandler) GetUrlShorten(c echo.Context) error {
+	urlShorten, err := listUrlShortens(context.Background(), h.Col)
+	if err != nil {
+		log.Printf("Unable to get list urlShorten %v", err)
+		return err
+	}
+
+	return c.JSON(http.StatusOK, urlShorten)
 }
