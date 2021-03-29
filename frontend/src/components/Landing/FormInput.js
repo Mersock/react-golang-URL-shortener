@@ -1,7 +1,8 @@
-import React from 'react'
-import { Button, Form, FormGroup, Label, Input, Alert } from 'reactstrap';
+import React, { useState } from 'react'
+import { Button, Form, FormGroup, Label, Input, Alert, FormFeedback } from 'reactstrap';
 
 const FormInput = (props) => {
+    const [inputValid, setinputValid] = useState(false)
     return (
         <div>
             <Form>
@@ -12,7 +13,8 @@ const FormInput = (props) => {
                             <span>Ex: <a href="https://www.youtube.com">https://www.youtube.com</a></span>
                         </div>
                     </Label>
-                    <Input type="text" name="originalURL" id="originalURL" placeholder="originalURL" />
+                    <Input invalid={inputValid} type="text" name="originalURL" id="originalURL" placeholder="originalURL" />
+                    <FormFeedback>Oh noes! that Url is invalid</FormFeedback>
                 </FormGroup>
                 <FormGroup>
                     <Label for="exampleShortURL"><h2>Short Url</h2></Label>
