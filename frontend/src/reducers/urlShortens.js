@@ -9,7 +9,7 @@ const urlShortens = (state = initialState, { type, payload }) => {
     switch (type) {
 
         case CREATE_URL:
-            return { ...state, ...payload }
+            return { ...state, createUrl: payload }
 
         default:
             return state
