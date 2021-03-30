@@ -1,5 +1,5 @@
 import React from 'react'
-import Header from './header'
+import Header from './headerUrl'
 import FormInput from './formInputUrl'
 
 const index = (props) => {
